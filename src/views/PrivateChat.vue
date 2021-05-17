@@ -91,8 +91,8 @@
             </div>
             <div class="mesgs">
             <div class="msg_history">
-                <div :key="msg.id" v-for="msg in messages" class="incoming_msg">
-                <div class="received_msg">
+                <div :key="msg.id" v-for="msg in messages">
+                <div :class="[msg.data.author === authUser.displayName ? 'sent_msg' : 'received_msg']">
                     <div class="received_withd_msg">
                     <p>{{ msg.data.message }}</p>
                     <span class="time_date">{{ msg.data.author }}</span></div>
@@ -130,12 +130,18 @@ export default {
   },
 
   methods: {
+      scrollToBottom() {
+          let box = document.querySelector('.msg_history');
+          box.scrollTop = box.scrollHeight;
+      },
       saveMessage() {
         //   save to firestore
         db.collection('chat').add({
             message: this.message,
             author: this.authUser.displayName,
             createdAt: new Date()
+        }).then (() => {
+            this.scrollToBottom();
         })
 
         this.message = null;
@@ -148,7 +154,10 @@ export default {
                   console.log(allMessages)                
               });
               this.messages = allMessages;
+              setTimeout(() => {
+                this.scrollToBottom();
 
+              }, 1000);
           })
 
       }
@@ -286,7 +295,7 @@ export default {
     .outgoing_msg{ overflow:hidden; margin:26px 0 26px;}
     .sent_msg {
     float: right;
-    width: 46%;
+    width: 100%;
     }
     .input_msg_write input {
     background: rgba(0, 0, 0, 0) none repeat scroll 0 0;
@@ -316,4 +325,24 @@ export default {
     height: 516px;
     overflow-y: auto;
     }
+    
+    .sent_msg .received_withd_msg {
+        margin-left: auto;
+    }
+
+    .sent_msg .received_withd_msg p  {
+        background: #ebebeb;
+        color: #646464;
+    }
+
+    .received_msg .received_withd_msg {
+    }
+
+    .received_msg .received_withd_msg p {
+        background: rgb(217,79,112);
+        color: #fff;
+
+    }
+
+
 </style>
