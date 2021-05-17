@@ -95,7 +95,7 @@
                 <div class="received_msg">
                     <div class="received_withd_msg">
                     <p>{{ msg.data.message }}</p>
-                    <span class="time_date"> 11:01 AM    |    June 9</span></div>
+                    <span class="time_date">{{ msg.data.author }}</span></div>
                 </div>
                 </div>
             </div>
@@ -117,13 +117,15 @@
 
 <script>
 // @ is an alias to /src
+    import firebase from 'firebase'
 
 export default {  
   name: 'PrivateChat',
   data() {
       return {
           message: null,
-          messages: []
+          messages: [],
+          authUser: {}
       }
   },
 
@@ -132,6 +134,7 @@ export default {
         //   save to firestore
         db.collection('chat').add({
             message: this.message,
+            author: this.authUser.displayName,
             createdAt: new Date()
         })
 
@@ -152,8 +155,28 @@ export default {
   },
 
   created() {
+      firebase.auth().onAuthStateChanged(user => {
+          if (user) {
+              this.authUser = user;
+          } else {
+              this.authUser = {}
+          }
+      })
       this.fetchMessages()
+  },
+
+  beforeRouteEnter (to, from, next) {
+      next(vm => {
+          firebase.auth().onAuthStateChanged(user => {
+              if (user) {
+                  next();
+              } else {
+                  vm.$router.push('/login')
+              }
+          })
+      })
   }
+  
 }
 </script>
 
