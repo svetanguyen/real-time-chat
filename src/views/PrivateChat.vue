@@ -335,9 +335,6 @@ export default {
         color: #646464;
     }
 
-    .received_msg .received_withd_msg {
-    }
-
     .received_msg .received_withd_msg p {
         background: rgb(217,79,112);
         color: #fff;
